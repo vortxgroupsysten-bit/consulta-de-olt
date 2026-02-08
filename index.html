@@ -2,177 +2,85 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Consulta OLT Uberaba 2025</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta OLT 2026</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; text-align: center; padding: 30px; }
-        .container { max-width: 500px; margin: 0 auto; }
-        input { padding: 12px; font-size: 18px; text-align: center; width: 70%; border-radius: 5px; border: none; }
+        :root { --bg: #121212; --card: #1e1e1e; --accent: #007bff; --success: #28a745; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 500px; text-align: center; }
         
-        button { padding: 12px 20px; font-size: 18px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 5px; transition: 0.3s; }
-        button:hover { background-color: #0056b3; }
+        .search-box { display: flex; gap: 8px; margin-bottom: 15px; }
+        input { flex: 1; padding: 12px; border-radius: 6px; border: none; font-size: 16px; text-align: center; }
         
-        /* Estilo para a área dos botões de ferramentas */
-        .ferramentas-container { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: 15px; 
-            justify-content: center;
-        }
-        
-        .btn-ferramenta { 
-            background-color: #28a745; 
-            flex: 1; 
-            font-size: 14px; 
-            padding: 10px;
-        }
-        .btn-ferramenta:hover { background-color: #1e7e34; }
+        button { padding: 12px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-search { background: var(--accent); color: white; }
+        .btn-tool { background: var(--success); color: white; flex: 1; font-size: 14px; margin-top: 10px; }
+        button:hover { opacity: 0.8; }
 
-        .card { background: #1e1e1e; margin-top: 20px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .badge { display: inline-block; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 1.2em; margin-top: 15px; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        .info-bairro { font-size: 0.9em; color: #ccc; margin-top: 5px; }
-        .aviso { color: #ffeb3b; border: 1px dashed #ffeb3b; padding: 15px; margin-top: 15px; text-align: left; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .badge { display: inline-block; padding: 12px 25px; border-radius: 8px; font-size: 1.2rem; font-weight: bold; margin-top: 15px; }
+        .error { color: #ff5555; border: 1px dashed #ff5555; padding: 15px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>📡 Localizador de OLT</h2>
-        <div style="display: flex; gap: 5px; justify-content: center;">
-            <input type="text" id="cep" placeholder="Digite o CEP" maxlength="9">
-            <button onclick="verificar()">Buscar</button>
-        </div>
-
-        <div class="ferramentas-container">
-            <button class="btn-ferramenta" onclick="abrir('https://tcftelecom.hubsoft.com.br/rede/rede/equipamento_conexao')">🌐 Rede/Conexão</button>
-            <button class="btn-ferramenta" onclick="abrir('https://tcftelecom.hubsoft.com.br/atendimento_os/agenda_tecnico')">📅 Agenda Técnico</button>
-        </div>
-
-        <div id="resultado"></div>
+<div class="container">
+    <h2>📡 Localizador de OLT</h2>
+    
+    <div class="search-box">
+        <input type="text" id="cep" placeholder="Digite o CEP" maxlength="9" onkeyup="if(event.key==='Enter') verificar()">
+        <button class="btn-search" onclick="verificar()">Buscar</button>
     </div>
 
-    <script>
-        // Função simples para abrir links
-        function abrir(url) {
-            window.open(url, '_blank');
-        }
+    <div style="display: flex; gap: 8px;">
+        <button class="btn-tool" onclick="window.open('https://tcftelecom.hubsoft.com.br/rede/rede/equipamento_conexao')">🌐 Rede</button>
+        <button class="btn-tool" onclick="window.open('https://tcftelecom.hubsoft.com.br/atendimento_os/agenda_tecnico')">📅 Agenda</button>
+    </div>
 
-        const baseDeDados = [
-            {
-                olt: "OLT MORUMBI",
-                vlan: "1201",
-                cor: "#555555",
-                bairros: ["MORUMBI", "RESIDENCIAL MORUMBI", "PACAEMBU", "PACAEMBU II", "JARDIM COPACABANA", "BEIJA-FLOR", "BEIJA-FLOR II", "PORTAL BEIJA FLOR", "JARDIM ESPANHA", "NOVA ERA", "RESIDENCIAL NOVA ERA", "ALFREDO FREIRE", "CONJUNTO ALFREDO FREIRE", "ALFREDO FREIRE II", "ALFREDO FREIRE III", "JARDIM IMPERADOR", "PARQUE DOS GIRASSOIS", "VILA ARQUELAU", "Chácaras Mariitas"]
-            },
-            {
-                olt: "OLT VIANA",
-                vlan: "1203",
-                cor: "#008000",
-                bairros: ["MERCÊS", "SANTA MARIA", "UNIVERSITÁRIO", "VILA CELESTE", "JARDIM UBERABA", "DISTRITO INDUSTRIAL I", "OLINDA", "JARDIM AMÉRICA", "VILA SAO VICENTE", "JARDIM SANTA CLARA", "PONTAL", "CONJUNTO PONTAL", "UNIVERDECIDADE","SANTA MARTA", "FABRICIO"]
-            },
-            {
-                olt: "OLT PA",
-                vlan: "1205",
-                cor: "#0000CD",
-                bairros: ["SÃO BENEDITO", "BOM RETIRO", "CENTRO", "PARQUE DAS AMERICAS", "JARDIM INDUBERABA", "VILA OLÍMPICA", "JARDIM SAO BENTO", "VILA MARIA HELENA"]
-            },
-            {
-                olt: "OLT ABADIA",
-                vlan: "1207",
-                cor: "#FF69B4",
-                bairros: ["ABADIA", "NOSSA SENHORA DA ABADIA", "LEBLON", "VILA SÃO CRISTÓVÃO", "JARDIM ELDORADO"]
-            },
-            {
-                olt: "OLT ELIAS JOÃO 02",
-                vlan: "1232",
-                cor: "#FFD700",
-                bairros: ["BOA VISTA", "COHAB BOA VISTA", "VILA BOA VISTA", "JARDIM ESPIRITO SANTO", "AMOROSO COSTA"]
-            },
-            {
-                olt: "OLT ELIAS JOÃO 01",
-                vlan: "1231",
-                cor: "#800080",
-                bairros: ["VILA MILITAR", "JARDIM ALEXANDRE CAMPOS", "VILA NOVA", "JARDIM DO BARREIRO", "ESTADOS UNIDOS", "Vila Frei Eugênio"]
-            },
-            {
-                olt: "OLT DESTERRO",
-                vlan: "1217",
-                cor: "#DC143C",
-                bairros: ["DESTERRO", "JARDIM PRIMAVERA", "CIDADE NOVA", "JARDIM ELZA AMUI", "ELZA AMUÍ", "ELZA AMUI I", "ELZA AMUI II", "ELZA AMUI III", "ELZA AMUI IV", "CONJUNTO MANOEL MENDES", "MANOEL MENDES", "RESIDENCIAL TANCREDO NEVES", "JARDIM BELO HORIZONTE", "ONEIDA MENDES", "ZEZE FERREIRA", "PARQUE DO MIRANTE", "JARDIM METROPOLE", "RESIDENCIAL 2000"]
-            },
-            {
-                olt: "OLT TURIN",
-                vlan: "1203",
-                cor: "#00CED1",
-                bairros: ["JARDIM ITÁLIA", "RECREIO DOS BANDEIRANTES", "JARDIM DO LAGO", "RESIDENCIAL RIO DE JANEIRO", "JARDIM MARACANA", "VILA PRESIDENTE VARGAS", "RESIDENCIAL VENEZA", "CIDADE OZANAN", "PARQUE DAS GAMELEIRAS", "CONJUNTO JOSE VALLIM DE MELO"]
-            },
-            {
-                olt: "OLT LARANJEIRAS",
-                vlan: "1200",
-                cor: "#ff8c00",
-                bairros: ["LARANJEIRAS", "PARQUE DAS LARANJEIRAS", "CHITÃO", "CONJUNTO UBERABA", "JARDIM ALVORADA"]
-            }
-        ];
+    <div id="resultado"></div>
+</div>
 
-        async function verificar() {
-            let cep = document.getElementById('cep').value.replace(/\D/g, '');
-            let divRes = document.getElementById('resultado');
+<script>
+    const OLT_DATA = [
+        { olt: "OLT MORUMBI", vlan: "1201", cor: "#555555", bairros: ["MORUMBI", "RESIDENCIAL MORUMBI", "PACAEMBU", "PACAEMBU II", "JARDIM COPACABANA", "BEIJA-FLOR", "BEIJA-FLOR II", "PORTAL BEIJA FLOR", "JARDIM ESPANHA", "NOVA ERA", "RESIDENCIAL NOVA ERA", "ALFREDO FREIRE", "CONJUNTO ALFREDO FREIRE", "ALFREDO FREIRE II", "ALFREDO FREIRE III", "JARDIM IMPERADOR", "PARQUE DOS GIRASSOIS", "VILA ARQUELAU", "CHACARAS MARIITAS", "SAO BENEDITO", "JOCKEY PARK"] },
+        { olt: "OLT VIANA", vlan: "1203", cor: "#008000", bairros: ["MERCES", "SANTA MARIA", "UNIVERSITARIO", "VILA CELESTE", "JARDIM UBERABA", "DISTRITO INDUSTRIAL I", "OLINDA", "JARDIM AMERICA", "VILA SAO VICENTE", "JARDIM SANTA CLARA", "PONTAL", "CONJUNTO PONTAL", "UNIVERDECIDADE","SANTA MARTA", "FABRICIO", "LOTEAMENTO UBERVILLE"] },
+        { olt: "OLT PA", vlan: "1205", cor: "#0000CD", bairros: ["BOM RETIRO", "CENTRO", "PARQUE DAS AMERICAS", "JARDIM INDUBERABA", "VILA OLIMPICA", "JARDIM SAO BENTO", "VILA MARIA HELENA"] },
+        { olt: "OLT ABADIA", vlan: "1207", cor: "#FF69B4", bairros: ["ABADIA", "NOSSA SENHORA DA ABADIA", "LEBLON", "VILA SAO CRISTOVAO", "JARDIM ELDORADO"] },
+        { olt: "OLT ELIAS JOAO 02", vlan: "1232", cor: "#FFD700", bairros: ["BOA VISTA", "COHAB BOA VISTA", "VILA BOA VISTA", "JARDIM ESPIRITO SANTO", "AMOROSO COSTA"] },
+        { olt: "OLT ELIAS JOAO 01", vlan: "1231", cor: "#800080", bairros: ["VILA MILITAR", "JARDIM ALEXANDRE CAMPOS", "VILA NOVA", "JARDIM DO BARREIRO", "ESTADOS UNIDOS", "VILA FREI EUGENIO"] },
+        { olt: "OLT DESTERRO", vlan: "1217", cor: "#DC143C", bairros: ["DESTERRO", "JARDIM PRIMAVERA", "CIDADE NOVA", "JARDIM ELZA AMUI", "ELZA AMUI", "ELZA AMUI I", "ELZA AMUI II", "ELZA AMUI III", "ELZA AMUI IV", "CONJUNTO MANOEL MENDES", "MANOEL MENDES", "RESIDENCIAL TANCREDO NEVES", "JARDIM BELO HORIZONTE", "ONEIDA MENDES", "ZEZE FERREIRA", "PARQUE DO MIRANTE", "JARDIM METROPOLE", "RESIDENCIAL 2000", "LOTEAMENTO RESERVA USHUAIA", "LOURDES"] },
+        { olt: "OLT TURIN", vlan: "1203", cor: "#00CED1", bairros: ["JARDIM ITALIA", "RECREIO DOS BANDEIRANTES", "JARDIM DO LAGO", "RESIDENCIAL RIO DE JANEIRO", "JARDIM MARACANA", "VILA PRESIDENTE VARGAS", "RESIDENCIAL VENEZA", "CIDADE OZANAN", "PARQUE DAS GAMELEIRAS", "CONJUNTO JOSE VALLIM DE MELO"] },
+        { olt: "OLT LARANJEIRAS", vlan: "1200", cor: "#ff8c00", bairros: ["LARANJEIRAS", "PARQUE DAS LARANJEIRAS", "CHITAO", "CONJUNTO UBERABA", "JARDIM ALVORADA"] }
+    ];
 
-            if(cep.length !== 8) { alert("CEP Inválido"); return; }
-            divRes.innerHTML = "<p>Consultando...</p>";
+    const limpar = t => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
 
-            try {
-                let req = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                let json = await req.json();
+    async function verificar() {
+        const cep = document.getElementById('cep').value.replace(/\D/g, '');
+        const resDiv = document.getElementById('resultado');
+        if (cep.length !== 8) return;
 
-                if(json.erro) { 
-                    divRes.innerHTML = "<p style='color: #ff5555'>CEP não encontrado!</p>"; 
-                    return; 
-                }
+        resDiv.innerHTML = "<p>Buscando...</p>";
 
-                let bairroApi = json.bairro.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-                let achou = false;
+        try {
+            const resp = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = await resp.json();
+            
+            if (data.erro) return resDiv.innerHTML = "<p class='error'>CEP não encontrado.</p>";
 
-                for(let item of baseDeDados) {
-                    let encontrouBairro = item.bairros.some(b => {
-                        let bLimpo = b.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-                        return bairroApi.includes(bLimpo) || bLimpo.includes(bairroApi);
-                    });
+            const bairroBusca = limpar(data.bairro);
+            const match = OLT_DATA.find(o => o.bairros.some(b => limpar(b) === bairroBusca));
 
-                    if(encontrouBairro) {
-                        divRes.innerHTML = `
-                            <div class="card">
-                                <h3>${json.logradouro}</h3>
-                                <p class="info-bairro">Bairro: ${json.bairro}</p>
-                                <div class="badge" style="background:${item.cor}">
-                                    ${item.olt}<br>
-                                    VLAN: ${item.vlan}
-                                </div>
-                            </div>
-                        `;
-                        achou = true;
-                        break;
-                    }
-                }
-
-                if(!achou) {
-                    divRes.innerHTML = `
-                        <div class="card">
-                            <p>${json.logradouro}</p>
-                            <div class="aviso">
-                                ⚠️ <strong>OLT NÃO IDENTIFICADA</strong><br><br>
-                                O sistema retornou o bairro:<br>
-                                <h2>"${json.bairro}"</h2>
-                                <br>
-                                Verifique no mapa onde este bairro fica e adicione o nome 
-                                <strong>"${json.bairro.toUpperCase()}"</strong> na lista do código.
-                            </div>
-                        </div>
-                    `;
-                }
-            } catch(e) {
-                divRes.innerHTML = "<p>Erro de conexão ou API.</p>";
-            }
-        }
-    </script>
+            resDiv.innerHTML = match 
+                ? `<div class="card">
+                    <h3>${data.logradouro}</h3>
+                    <p>${data.bairro}</p>
+                    <div class="badge" style="background:${match.cor}">${match.olt}<br>VLAN: ${match.vlan}</div>
+                   </div>`
+                : `<div class="card"><p class="error">Bairro <b>${data.bairro}</b> não mapeado.</p></div>`;
+                
+        } catch { resDiv.innerHTML = "Erro na rede."; }
+    }
+</script>
 </body>
 </html>
